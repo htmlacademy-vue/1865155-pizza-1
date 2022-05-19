@@ -84,8 +84,8 @@
                     :key="dough.id"
                     class="dough__input"
                     :class="{
-                      'dough__input--light': dough.id == 1,
-                      'dough__input--large': dough.id == 2,
+                      'dough__input--light': dough.id === 1,
+                      'dough__input--large': dough.id === 2,
                     }"
                   >
                     <input
@@ -111,9 +111,9 @@
                     :key="size.id"
                     class="diameter__input"
                     :class="{
-                      'diameter__input--small': size.id == 1,
-                      'diameter__input--normal': size.id == 2,
-                      'diameter__input--big': size.id == 3,
+                      'diameter__input--small': size.id === 1,
+                      'diameter__input--normal': size.id === 2,
+                      'diameter__input--big': size.id === 3,
                     }"
                   >
                     <input
@@ -163,8 +163,8 @@
                         <span
                           class="filling"
                           :class="getIngredientClassName(ingredient.image)"
-                          >{{ ingredient.name }}</span
-                        >
+                          >{{ ingredient.name }}
+                        </span>
                         <div
                           class="counter counter--orange ingredients__counter"
                         >
@@ -244,30 +244,34 @@ export default {
 
   methods: {
     getDoughValue(doughId) {
-      if (doughId == 1) {
+      if (doughId === 1) {
         return "light";
       } else {
         return "large";
       }
     },
     getSizeValue(sizeId) {
-      if (sizeId == 1) {
+      if (sizeId === 1) {
         return "small";
-      } else if (sizeId == 2) {
+      } else if (sizeId === 2) {
         return "normal";
       } else {
         return "big";
       }
     },
     getSauceValue(sauceId) {
-      if (sauceId == 1) {
+      if (sauceId === 1) {
         return "tomato";
       } else {
         return "creamy";
       }
     },
     getIngredientClassName(imgUrl) {
-      return "filling--" + imgUrl.slice(20, -4);
+      function replacer(match, p1, p2) {
+        return [p2];
+      }
+      let result = imgUrl.replace(/^\/(.+\/)*(.+)\.(.+)$/, replacer);
+      return "filling--" + result;
     },
   },
 };
