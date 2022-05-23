@@ -267,11 +267,7 @@ export default {
       }
     },
     getIngredientClassName(imgUrl) {
-      function replacer(match, p1, p2) {
-        return [p2];
-      }
-      let result = imgUrl.replace(/^\/(.+\/)*(.+)\.(.+)$/, replacer);
-      return "filling--" + result;
+      return "filling--" + imgUrl.match(/.*\/(.*)(\..*)$/)[1];
     },
   },
 };
