@@ -17,7 +17,9 @@
           <RadioButton
             name="diameter"
             :value="getSizeValue(size.id)"
+            :id="size.id"
             class="visually-hidden"
+            @getValueFromRadio="sendValue"
           />
           <span>{{ size.name }}</span>
         </label>
@@ -45,6 +47,9 @@ export default {
       } else {
         return "big";
       }
+    },
+    sendValue(data, id) {
+      this.$emit("getValueFromBuilder", data, "size", id);
     },
   },
 };

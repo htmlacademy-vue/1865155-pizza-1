@@ -16,7 +16,10 @@
           <RadioButton
             name="dought"
             :value="getDoughValue(dough.id)"
+            :id="dough.id"
+            :price="dough.price"
             class="visually-hidden"
+            @getValueFromRadio="sendValue"
           />
           <b>{{ dough.name }}</b>
           <span>{{ dough.description }}</span>
@@ -34,8 +37,8 @@ export default {
   },
   props: {
     pizzas: {},
+    dough: {},
   },
-
   methods: {
     getDoughValue(doughId) {
       if (doughId === 1) {
@@ -43,6 +46,9 @@ export default {
       } else {
         return "large";
       }
+    },
+    sendValue(data, id, price) {
+      this.$emit("getValueFromBuilder", data, "dough", id, price);
     },
   },
 };

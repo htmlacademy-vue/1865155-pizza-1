@@ -1,5 +1,11 @@
 <template>
-  <input type="radio" :name="names" :value="value" :class="classes" />
+  <input
+    type="radio"
+    :name="names"
+    :value="value"
+    :class="classes"
+    @click="sendValue"
+  />
 </template>
 
 <script>
@@ -9,8 +15,14 @@ export default {
     names: {},
     value: {},
     classes: {},
+    id: {},
+    price: {},
   },
 
-  methods: {},
+  methods: {
+    sendValue() {
+      this.$emit("getValueFromRadio", this.value, this.id, this.price);
+    },
+  },
 };
 </script>

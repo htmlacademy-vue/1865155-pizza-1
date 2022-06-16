@@ -1,10 +1,12 @@
 <template>
-  <div class="content__constructor">
-    <div class="pizza pizza--foundation--big-tomato">
+  <div class="content__constructor" @drop="onDrop($event)" @dragover.prevent>
+    <div class="pizza" :class="pizzaFoundationClass">
       <div class="pizza__wrapper">
-        <div class="pizza__filling pizza__filling--ananas"></div>
-        <div class="pizza__filling pizza__filling--bacon"></div>
-        <div class="pizza__filling pizza__filling--cheddar"></div>
+        <div
+          v-for="filling in pizzaIngredientsClass"
+          :key="filling.id"
+          :class="filling.className"
+        ></div>
       </div>
     </div>
   </div>
@@ -13,5 +15,15 @@
 <script>
 export default {
   name: "BuilderPizzaView",
+  props: {
+    pizzaFoundationClass: {},
+    pizzaIngredientsClass: [],
+  },
+  methods: {
+    onDrop(e) {
+      const id = e.dataTransfer.getData("ingredientId");
+      this.$emit("getCountFromDrop", id);
+    },
+  },
 };
 </script>
