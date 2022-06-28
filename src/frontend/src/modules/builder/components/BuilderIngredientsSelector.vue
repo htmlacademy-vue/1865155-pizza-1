@@ -1,0 +1,131 @@
+<template>
+  <div class="content__ingredients">
+    <div class="sheet">
+      <h2 class="title title--small sheet__title">Выберите ингредиенты</h2>
+      <div class="sheet__content ingredients">
+        <div class="ingredients__sauce">
+          <p>Основной соус:</p>
+          <label
+            v-for="sauce in pizzas.sauces"
+            :key="sauce.id"
+            class="radio ingredients__input"
+          >
+            <RadioButton
+              name="sauce"
+              :value="getSauceValue(sauce.id)"
+              :id="sauce.id"
+              :price="sauce.price"
+              :checked="sauce.id === myPizzaSauce.id"
+              @getValueFromRadio="sendValue"
+            />
+            <span>{{ sauce.name }}</span>
+          </label>
+        </div>
+
+        <div class="ingredients__filling">
+          <p>Начинка:</p>
+          <ul class="ingredients__list">
+            <li
+              v-for="ingredient in pizzas.ingredients"
+              :key="ingredient.id"
+              class="ingredients__item"
+              :draggable="isDraggable(ingredient.id)"
+              @dragstart="onDrag($event, ingredient)"
+            >
+              <SelectorItem
+                :ingredientName="ingredient.name"
+                :class="getIngredientClassName(ingredient.image)"
+              />
+              <ItemCounter
+                :ingredientId="ingredient.id"
+                :ingredientPrice="ingredient.price"
+                :myPizzaIngredients="myPizzaIngredients"
+                @update:itemCount="updateItemCount"
+              />
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import ItemCounter from "/src/common/components/ItemCounter.vue";
+import SelectorItem from "/src/common/components/SelectorItem.vue";
+import RadioButton from "/src/common/components/RadioButton.vue";
+
+export default {
+  name: "BuilderIngredientsSelector",
+  components: {
+    RadioButton,
+    ItemCounter,
+    SelectorItem,
+  },
+  props: {
+    myPizzaSauce: {
+      type: Object,
+      required: true,
+    },
+    pizzas: {
+      type: Object,
+      required: true,
+    },
+    myPizzaIngredients: {
+      type: Array,
+      required: true,
+    },
+  },
+
+  methods: {
+    updateItemCount(newValue, id, newPrice) {
+      this.$emit("updateItemCount", newValue, id, newPrice);
+    },
+    getSauceValue(sauceId) {
+      if (sauceId === 1) {
+        return "tomato";
+      } else {
+        return "creamy";
+      }
+    },
+    getIngredientClassName(imgUrl) {
+      return "filling--" + imgUrl.match(/.*\/(.*)(\..*)$/)[1];
+    },
+    sendValue(data, id, price) {
+      this.$emit("getValueFromBuilder", data, "sauce", id, price);
+    },
+    isDraggable(id) {
+      let index = this.myPizzaIngredients.findIndex((item) => item.id === id);
+      if (
+        index === -1 ||
+        this.myPizzaIngredients[
+          this.myPizzaIngredients.findIndex((item) => item.id === id)
+        ].count < 3
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    onDrag(e, ingredient) {
+      let index = this.myPizzaIngredients.findIndex(
+        (item) => item.id === ingredient.id
+      );
+      let count = 0;
+      if (index === -1) {
+        count = 1;
+      } else {
+        count =
+          this.myPizzaIngredients[
+            this.myPizzaIngredients.findIndex(
+              (item) => item.id === ingredient.id
+            )
+          ].count + 1;
+      }
+      e.dataTransfer.setData("ingredientCount", count);
+      e.dataTransfer.setData("ingredientId", ingredient.id);
+      e.dataTransfer.setData("ingredientPrice", ingredient.price);
+    },
+  },
+};
+</script>
