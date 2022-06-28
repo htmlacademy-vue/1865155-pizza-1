@@ -55,47 +55,40 @@
       <main class="content">
         <form action="#" method="post">
           <div class="content__wrapper">
-            имя: {{ myPizza.name }}<br />
-            тесто: {{ myPizza.dough }}<br />
-            размер: {{ myPizza.size }}<br />
-            соус: {{ myPizza.sauce }}<br />
-            ингридиенты: {{ myPizza.ingredients }}<br />
-            цена: {{ price }}<br />
-            корзина: {{ cart }}<br />
-            признак очистки: {{ clear }}
             <h1 class="title title--big">Конструктор пиццы</h1>
 
             <BuilderDoughSelector
               :pizzas="pizzas"
+              :myPizzaDough="myPizza.dough"
               @getValueFromBuilder="getValue"
             />
             <BuilderSizeSelector
               :pizzas="pizzas"
+              :myPizzaSize="myPizza.size"
               @getValueFromBuilder="getValue"
             />
             <BuilderIngredientsSelector
               :pizzas="pizzas"
-              :clear="clear.ingredients"
-              @clearExecuted="clearIngredientsExecuted"
+              :myPizzaSauce="myPizza.sauce"
+              :myPizzaIngredients="myPizza.ingredients"
               @getValueFromBuilder="getValue"
-              @getCountFromBuilder="getCount"
-              ref="childBuilderIngredientsSelector"
+              @updateItemCount="updateItemCount"
             />
 
             <div class="content__pizza">
               <BuilderNameSelector
-                :clear="clear.name"
-                @clearExecuted="clearNameExecuted"
+                v-model="myPizza.name"
                 @getNameFromBuilder="getValue"
               />
               <BuilderPizzaView
                 :pizzaFoundationClass="pizzaFoundationClass()"
-                :pizzaIngredientsClass="myPizza.ingredients"
+                :pizzas="pizzas"
+                :myPizzaIngredients="myPizza.ingredients"
                 @getCountFromDrop="getCountDrop"
               />
               <BuilderPriceCounter
                 :price="price"
-                :isDisabled="checkName()"
+                :myPizza="myPizza"
                 @getBake="addToCart"
               />
             </div>
@@ -137,26 +130,23 @@ export default {
       myPizza: {
         name: "",
         dough: {
-          value: "",
-          id: "",
-          price: "",
+          value: "light",
+          id: 1,
+          price: 300,
         },
         size: {
-          value: "",
-          id: "",
+          value: "normal",
+          id: 2,
+          multiplier: 2,
         },
         sauce: {
-          value: "",
-          id: "",
-          price: "",
+          value: "creamy",
+          id: 2,
+          price: 50,
         },
         ingredients: [],
       },
       cart: [],
-      clear: {
-        name: false,
-        ingredients: false,
-      },
     };
   },
   methods: {
@@ -173,6 +163,7 @@ export default {
         case "size":
           this.myPizza.size.value = data;
           this.myPizza.size.id = id;
+          this.myPizza.size.multiplier = price;
           break;
         case "sauce":
           this.myPizza.sauce.value = data;
@@ -181,28 +172,26 @@ export default {
           break;
       }
     },
-    getCount(count, id, className, price) {
+    updateItemCount(newValue, id, newPrice) {
       let index = this.myPizza.ingredients.findIndex((item) => item.id === id);
       if (index === -1) {
         this.myPizza.ingredients.push({
           id: id,
-          count: count,
-          className: className,
-          price: price,
+          count: newValue,
+          price: newPrice,
         });
         this.myPizza.ingredients.sort((a, b) => (a.id > b.id ? 1 : -1));
       } else {
-        if (count === 0) {
+        if (newValue === 0) {
           this.myPizza.ingredients.splice(index, 1);
         } else {
-          this.myPizza.ingredients[index].count = count;
-          this.myPizza.ingredients[index].className = className;
-          this.myPizza.ingredients[index].price = price;
+          this.myPizza.ingredients[index].count = newValue;
+          this.myPizza.ingredients[index].price = newPrice;
         }
       }
     },
-    getCountDrop(id) {
-      this.$refs.childBuilderIngredientsSelector.childMethod(id);
+    getCountDrop(count, id, className, price) {
+      this.updateItemCount(Number(count), Number(id), className, Number(price));
     },
     pizzaFoundationClass() {
       if (this.myPizza.dough.value && this.myPizza.sauce.value) {
@@ -228,19 +217,6 @@ export default {
         return "pizza--foundation--big-tomato";
       }
     },
-    checkName() {
-      if (
-        this.myPizza.name != "" &&
-        this.myPizza.ingredients.length != 0 &&
-        this.myPizza.dough.value != "" &&
-        this.myPizza.size.value != "" &&
-        this.myPizza.sauce.value != ""
-      ) {
-        return false;
-      } else {
-        return true;
-      }
-    },
     addToCart() {
       this.cart.push({
         id: this.cart.length,
@@ -248,35 +224,28 @@ export default {
         price: this.price,
       });
       this.myPizza.name = "";
-      this.myPizza.dough.value = "";
-      this.myPizza.dough.id = "";
-      this.myPizza.dough.price = "";
-      this.myPizza.size.value = "";
-      this.myPizza.size.id = "";
-      this.myPizza.sauce.value = "";
-      this.myPizza.sauce.id = "";
-      this.myPizza.sauce.price = "";
+      this.myPizza.dough.value = "light";
+      /* this.$set() и  Object.assign() не помогают вызвать перерендер
+      RadioButton в выборе по дефолту соуса, размера, теста
+      вызов this.$forceUpdate() в дочернем компоненте тоже не помог
+      биндинг checked у RadioButton через метод тоже не помог */
+      this.myPizza.dough.id = 1;
+      this.myPizza.dough.price = 300;
+      this.myPizza.size.value = "normal";
+      this.myPizza.size.id = 2;
+      this.myPizza.size.multiplier = 2;
+      this.myPizza.sauce.value = "creamy";
+      this.myPizza.sauce.id = 2;
+      this.myPizza.sauce.price = 50;
       this.myPizza.ingredients.length = 0;
-      this.clear.name = true;
-      this.clear.ingredients = true;
-    },
-    clearNameExecuted() {
-      this.clear.name = false;
-    },
-    clearIngredientsExecuted() {
-      this.clear.ingredients = false;
+      this.myPizza.ingredients = [...this.myPizza.ingredients];
     },
   },
   computed: {
     price: function () {
-      if (
-        this.myPizza.ingredients.length != 0 &&
-        this.myPizza.dough.price != "" &&
-        this.myPizza.size.id != "" &&
-        this.myPizza.sauce.price != ""
-      ) {
+      if (this.myPizza.ingredients.length != 0) {
         return (
-          this.myPizza.size.id *
+          this.myPizza.size.multiplier *
           (this.myPizza.dough.price +
             this.myPizza.sauce.price +
             this.myPizza.ingredients.reduce(

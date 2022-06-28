@@ -1,10 +1,8 @@
 <template>
   <input
     type="radio"
-    :name="names"
     :value="value"
-    :class="classes"
-    @click="sendValue"
+    @click="$emit('getValueFromRadio', value, id, price)"
   />
 </template>
 
@@ -12,16 +10,17 @@
 export default {
   name: "RadioButton",
   props: {
-    names: {},
-    value: {},
-    classes: {},
-    id: {},
-    price: {},
-  },
-
-  methods: {
-    sendValue() {
-      this.$emit("getValueFromRadio", this.value, this.id, this.price);
+    value: {
+      type: String,
+      required: true,
+    },
+    id: {
+      type: Number,
+      required: true,
+    },
+    price: {
+      type: Number,
+      default: 0,
     },
   },
 };

@@ -5,7 +5,8 @@
       type="text"
       name="pizza_name"
       placeholder="Введите название пиццы"
-      @input="sendName"
+      :value="value"
+      @input="$emit('getNameFromBuilder', $event.target.value, 'name')"
     />
   </label>
 </template>
@@ -14,23 +15,9 @@
 export default {
   name: "BuilderNameSelector",
   props: {
-    clear: {},
-  },
-  methods: {
-    sendName() {
-      this.$emit(
-        "getNameFromBuilder",
-        document.getElementsByName("pizza_name")[0].value,
-        "name"
-      );
-    },
-  },
-  watch: {
-    clear: function (clear) {
-      if (clear === true) {
-        document.getElementsByName("pizza_name")[0].value = "";
-        this.$emit("clearExecuted");
-      }
+    value: {
+      type: String,
+      required: true,
     },
   },
 };

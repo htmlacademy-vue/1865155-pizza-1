@@ -19,6 +19,7 @@
             :id="dough.id"
             :price="dough.price"
             class="visually-hidden"
+            :checked="dough.id === myPizzaDough.id"
             @getValueFromRadio="sendValue"
           />
           <b>{{ dough.name }}</b>
@@ -30,14 +31,22 @@
 </template>
 
 <script>
+import RadioButton from "/src/common/components/RadioButton.vue";
+
 export default {
   name: "BuilderDoughSelector",
   components: {
-    RadioButton: () => import("/src/common/components/RadioButton.vue"),
+    RadioButton,
   },
   props: {
-    pizzas: {},
-    dough: {},
+    myPizzaDough: {
+      type: Object,
+      required: true,
+    },
+    pizzas: {
+      type: Object,
+      required: true,
+    },
   },
   methods: {
     getDoughValue(doughId) {

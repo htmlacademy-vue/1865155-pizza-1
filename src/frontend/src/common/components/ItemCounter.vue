@@ -4,16 +4,25 @@
       type="button"
       class="counter__button counter__button--minus"
       :disabled="minusDisabled"
-      @click="minus"
+      @click="
+        $emit('update:itemCount', setValue() - 1, ingredientId, ingredientPrice)
+      "
     >
       <span class="visually-hidden">Меньше</span>
     </button>
-    <input type="text" name="counter" class="counter__input" :value="value" />
+    <input
+      type="text"
+      name="counter"
+      class="counter__input"
+      :value="setValue()"
+    />
     <button
       type="button"
       class="counter__button counter__button--plus"
       :disabled="plusDisabled"
-      @click="plus"
+      @click="
+        $emit('update:itemCount', setValue() + 1, ingredientId, ingredientPrice)
+      "
     >
       <span class="visually-hidden">Больше</span>
     </button>
@@ -23,101 +32,70 @@
 <script>
 export default {
   name: "ItemCounter",
-  data() {
-    return {
-      value: 0,
-      minusDisabled: true,
-      plusDisabled: false,
-      ingredientClassName: "",
-    };
-  },
   props: {
-    ingredientId: {},
-    ingredientClass: {},
-    ingredientPrice: {},
-    clear: {},
+    ingredientId: {
+      type: Number,
+      required: true,
+    },
+    ingredientPrice: {
+      type: Number,
+      required: true,
+    },
+    myPizzaIngredients: {
+      type: Array,
+      required: true,
+    },
   },
   methods: {
-    minus() {
-      switch (this.value) {
-        case 1:
-          this.value--;
-          this.minusDisabled = true;
-          break;
-        case 2:
-          this.value--;
-          this.ingredientClassName =
-            "pizza__filling pizza__" + this.ingredientClass;
-          break;
-        case 3:
-          this.value--;
-          this.ingredientClassName =
-            "pizza__filling pizza__" +
-            this.ingredientClass +
-            " pizza__filling--second";
-          this.plusDisabled = false;
-          this.$emit("getNotDraggableBoolean", this.ingredientId, false);
-          break;
-      }
-      this.$emit(
-        "getItemCount",
-        this.value,
-        this.ingredientId,
-        this.ingredientClassName,
-        this.ingredientPrice
+    setValue() {
+      let index = this.myPizzaIngredients.findIndex(
+        (item) => item.id === this.ingredientId
       );
-    },
-    plus() {
-      switch (this.value) {
-        case 0:
-          this.value++;
-          this.minusDisabled = false;
-          this.ingredientClassName =
-            "pizza__filling pizza__" + this.ingredientClass;
-          break;
-        case 1:
-          this.value++;
-          this.ingredientClassName =
-            "pizza__filling pizza__" +
-            this.ingredientClass +
-            " pizza__filling--second";
-          break;
-        case 2:
-          this.value++;
-          this.ingredientClassName =
-            "pizza__filling pizza__" +
-            this.ingredientClass +
-            " pizza__filling--third";
-          this.plusDisabled = true;
-          this.$emit("getNotDraggableBoolean", this.ingredientId, true);
-          break;
+      if (index === -1) {
+        return 0;
+      } else {
+        let value =
+          this.myPizzaIngredients[
+            this.myPizzaIngredients.findIndex(
+              (item) => item.id === this.ingredientId
+            )
+          ].count;
+        return value;
       }
-      this.$emit(
-        "getItemCount",
-        this.value,
-        this.ingredientId,
-        this.ingredientClassName,
-        this.ingredientPrice
-      );
     },
-    setDraggable() {
-      if (this.value < 3) {
+  },
+  computed: {
+    minusDisabled: function () {
+      let index = this.myPizzaIngredients.findIndex(
+        (item) => item.id === this.ingredientId
+      );
+      if (index === -1) {
         return true;
       } else {
         return false;
       }
     },
-  },
-  watch: {
-    clear: function (clear) {
-      if (clear === true) {
-        console.log(clear);
-        this.value = 0;
-        this.minusDisabled = true;
-        this.plusDisabled = false;
-        if (this.ingredientId === 15) {
-          this.$emit("clearExecuted");
+    plusDisabled: function () {
+      let index = this.myPizzaIngredients.findIndex(
+        (item) => item.id === this.ingredientId
+      );
+      if (index === -1) {
+        return false;
+      } else {
+        let value =
+          this.myPizzaIngredients[
+            this.myPizzaIngredients.findIndex(
+              (item) => item.id === this.ingredientId
+            )
+          ].count;
+        switch (value) {
+          case 1:
+          case 2:
+            return false;
+          case 3:
+            return true;
         }
+        return true;
       }
     },
   },

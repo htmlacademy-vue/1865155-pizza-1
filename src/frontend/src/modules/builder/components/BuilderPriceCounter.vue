@@ -1,7 +1,12 @@
 <template>
   <div class="content__result">
     <p>Итого: {{ price }} ₽</p>
-    <button type="button" class="button" :disabled="isDisabled" @click="bake">
+    <button
+      type="button"
+      class="button"
+      :disabled="isDisabled()"
+      @click="$emit('getBake')"
+    >
       Готовьте!
     </button>
   </div>
@@ -11,12 +16,23 @@
 export default {
   name: "BuilderPriceCounter",
   props: {
-    price: {},
-    isDisabled: {},
+    price: {
+      type: Number,
+      required: true,
+    },
+    myPizza: {
+      type: Object,
+      required: true,
+    },
   },
+
   methods: {
-    bake() {
-      this.$emit("getBake");
+    isDisabled() {
+      if (this.myPizza.name != "" && this.myPizza.ingredients.length != 0) {
+        return false;
+      } else {
+        return true;
+      }
     },
   },
 };

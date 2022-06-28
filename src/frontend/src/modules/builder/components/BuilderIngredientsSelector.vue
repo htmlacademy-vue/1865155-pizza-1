@@ -15,6 +15,7 @@
               :value="getSauceValue(sauce.id)"
               :id="sauce.id"
               :price="sauce.price"
+              :checked="sauce.id === myPizzaSauce.id"
               @getValueFromRadio="sendValue"
             />
             <span>{{ sauce.name }}</span>
@@ -28,22 +29,18 @@
               v-for="ingredient in pizzas.ingredients"
               :key="ingredient.id"
               class="ingredients__item"
-              :draggable="!notdraggable[ingredient.id]"
+              :draggable="isDraggable(ingredient.id)"
               @dragstart="onDrag($event, ingredient)"
             >
               <SelectorItem
                 :ingredientName="ingredient.name"
-                :ingredientClass="getIngredientClassName(ingredient.image)"
+                :class="getIngredientClassName(ingredient.image)"
               />
               <ItemCounter
                 :ingredientId="ingredient.id"
-                :ingredientClass="getIngredientClassName(ingredient.image)"
                 :ingredientPrice="ingredient.price"
-                :clear="clear"
-                @clearExecuted="clearExecuted"
-                @getItemCount="sendCount"
-                @getNotDraggableBoolean="setNotDraggable"
-                ref="childItemCounter"
+                :myPizzaIngredients="myPizzaIngredients"
+                @update:itemCount="updateItemCount"
               />
             </li>
           </ul>
@@ -56,25 +53,34 @@
 <script>
 import ItemCounter from "/src/common/components/ItemCounter.vue";
 import SelectorItem from "/src/common/components/SelectorItem.vue";
+import RadioButton from "/src/common/components/RadioButton.vue";
 
 export default {
   name: "BuilderIngredientsSelector",
   components: {
-    RadioButton: () => import("/src/common/components/RadioButton.vue"),
+    RadioButton,
     ItemCounter,
     SelectorItem,
   },
-  data() {
-    return {
-      notdraggable: [],
-    };
-  },
   props: {
-    pizzas: {},
-    clear: {},
+    myPizzaSauce: {
+      type: Object,
+      required: true,
+    },
+    pizzas: {
+      type: Object,
+      required: true,
+    },
+    myPizzaIngredients: {
+      type: Array,
+      required: true,
+    },
   },
 
   methods: {
+    updateItemCount(newValue, id, newPrice) {
+      this.$emit("updateItemCount", newValue, id, newPrice);
+    },
     getSauceValue(sauceId) {
       if (sauceId === 1) {
         return "tomato";
@@ -88,21 +94,37 @@ export default {
     sendValue(data, id, price) {
       this.$emit("getValueFromBuilder", data, "sauce", id, price);
     },
-    sendCount(count, id, className, price) {
-      this.$emit("getCountFromBuilder", count, id, className, price);
-    },
-    setNotDraggable(id, boolean) {
-      this.notdraggable[id] = boolean;
-      this.notdraggable = [...this.notdraggable]; //без этого не перерендерит draggable у списка ингредиентов
+    isDraggable(id) {
+      let index = this.myPizzaIngredients.findIndex((item) => item.id === id);
+      if (
+        index === -1 ||
+        this.myPizzaIngredients[
+          this.myPizzaIngredients.findIndex((item) => item.id === id)
+        ].count < 3
+      ) {
+        return true;
+      } else {
+        return false;
+      }
     },
     onDrag(e, ingredient) {
+      let index = this.myPizzaIngredients.findIndex(
+        (item) => item.id === ingredient.id
+      );
+      let count = 0;
+      if (index === -1) {
+        count = 1;
+      } else {
+        count =
+          this.myPizzaIngredients[
+            this.myPizzaIngredients.findIndex(
+              (item) => item.id === ingredient.id
+            )
+          ].count + 1;
+      }
+      e.dataTransfer.setData("ingredientCount", count);
       e.dataTransfer.setData("ingredientId", ingredient.id);
-    },
-    childMethod(id) {
-      this.$refs.childItemCounter[id - 1].plus();
-    },
-    clearExecuted() {
-      this.$emit("clearExecuted");
+      e.dataTransfer.setData("ingredientPrice", ingredient.price);
     },
   },
 };

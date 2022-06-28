@@ -1,13 +1,15 @@
 <template>
-  <span class="filling" :class="ingredientClass">{{ ingredientName }} </span>
+  <span class="filling">{{ ingredientName }} </span>
 </template>
 
 <script>
 export default {
-  name: "RadioButton",
+  name: "SelectorItem",
   props: {
-    ingredientName: {},
-    ingredientClass: {},
+    ingredientName: {
+      type: String,
+      required: true,
+    },
   },
 };
 </script>

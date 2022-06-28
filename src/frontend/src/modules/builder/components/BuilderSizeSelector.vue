@@ -18,7 +18,9 @@
             name="diameter"
             :value="getSizeValue(size.id)"
             :id="size.id"
+            :price="size.multiplier"
             class="visually-hidden"
+            :checked="size.id === myPizzaSize.id"
             @getValueFromRadio="sendValue"
           />
           <span>{{ size.name }}</span>
@@ -29,13 +31,22 @@
 </template>
 
 <script>
+import RadioButton from "/src/common/components/RadioButton.vue";
+
 export default {
   name: "BuilderSizeSelector",
   components: {
-    RadioButton: () => import("/src/common/components/RadioButton.vue"),
+    RadioButton,
   },
   props: {
-    pizzas: {},
+    myPizzaSize: {
+      type: Object,
+      required: true,
+    },
+    pizzas: {
+      type: Object,
+      required: true,
+    },
   },
 
   methods: {
@@ -48,8 +59,8 @@ export default {
         return "big";
       }
     },
-    sendValue(data, id) {
-      this.$emit("getValueFromBuilder", data, "size", id);
+    sendValue(data, id, price) {
+      this.$emit("getValueFromBuilder", data, "size", id, price);
     },
   },
 };

@@ -23,7 +23,10 @@
 export default {
   name: "AppLayout",
   props: {
-    cartPrice: {},
+    cartPrice: {
+      type: Number,
+      required: true,
+    },
   },
 };
 </script>
