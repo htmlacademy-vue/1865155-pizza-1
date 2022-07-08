@@ -1,16 +1,28 @@
 <template>
   <div id="app">
-    <Index />
+    <AppLayout :cartPrice="cartPrice">
+      <router-view @updateCartPrice="updateCartPrice" />
+    </AppLayout>
   </div>
 </template>
 
 <script>
-import Index from "@/views/Index";
+import AppLayout from "@/layouts/AppLayout.vue";
 
 export default {
   name: "App",
   components: {
-    Index,
+    AppLayout,
+  },
+  data() {
+    return {
+      cartPrice: 0,
+    };
+  },
+  methods: {
+    updateCartPrice(price) {
+      this.cartPrice = price;
+    },
   },
 };
 </script>

@@ -4,7 +4,7 @@
     <button
       type="button"
       class="button"
-      :disabled="isDisabled()"
+      :disabled="isDisabled"
       @click="$emit('getBake')"
     >
       Готовьте!
@@ -20,15 +20,19 @@ export default {
       type: Number,
       required: true,
     },
-    myPizza: {
-      type: Object,
-      required: true,
+    pizzaName: {
+      type: String,
+      default: "",
+    },
+    ingredientsCount: {
+      type: Number,
+      default: 0,
     },
   },
 
-  methods: {
-    isDisabled() {
-      if (this.myPizza.name != "" && this.myPizza.ingredients.length != 0) {
+  computed: {
+    isDisabled: function () {
+      if (this.pizzaName != "" && this.ingredientsCount != 0) {
         return false;
       } else {
         return true;

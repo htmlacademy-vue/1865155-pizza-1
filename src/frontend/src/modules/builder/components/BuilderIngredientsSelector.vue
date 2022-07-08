@@ -37,10 +37,10 @@
                 :class="getIngredientClassName(ingredient.image)"
               />
               <ItemCounter
-                :ingredientId="ingredient.id"
-                :ingredientPrice="ingredient.price"
-                :myPizzaIngredients="myPizzaIngredients"
-                @update:itemCount="updateItemCount"
+                :count="getCount(ingredient.id)"
+                @update:itemCount="
+                  updateItemCount($event, ingredient.id, ingredient.price)
+                "
               />
             </li>
           </ul>
@@ -78,8 +78,17 @@ export default {
   },
 
   methods: {
-    updateItemCount(newValue, id, newPrice) {
-      this.$emit("updateItemCount", newValue, id, newPrice);
+    getCount(id) {
+      let index = this.myPizzaIngredients.findIndex((item) => item.id === id);
+      if (index === -1) {
+        return 0;
+      } else {
+        let value = this.myPizzaIngredients[index].count;
+        return value;
+      }
+    },
+    updateItemCount(count, id, price) {
+      this.$emit("updateItemCount", count, id, price);
     },
     getSauceValue(sauceId) {
       if (sauceId === 1) {
