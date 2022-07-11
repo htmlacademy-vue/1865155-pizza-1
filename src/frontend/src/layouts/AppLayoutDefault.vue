@@ -52,7 +52,7 @@
     <body>
       <header class="header">
         <div class="header__logo">
-          <a href="index.html" class="logo">
+          <a href="/" class="logo">
             <img
               src="@/assets/img/logo.svg"
               alt="V!U!E! Pizza logo"
@@ -62,10 +62,10 @@
           </a>
         </div>
         <div class="header__cart">
-          <a href="cart.html">{{ cartPrice }} ₽</a>
+          <a href="/cart">{{ cartPrice }} ₽</a>
         </div>
         <div class="header__user">
-          <a href="login.html" class="header__login"><span>Войти</span></a>
+          <a href="/login" class="header__login"><span>Войти</span></a>
         </div>
       </header>
       <slot />

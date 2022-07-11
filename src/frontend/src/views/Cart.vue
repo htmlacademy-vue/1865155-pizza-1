@@ -278,7 +278,7 @@
     </main>
     <section class="footer">
       <div class="footer__more">
-        <a href="#" class="button button--border button--arrow"
+        <a href="/" class="button button--border button--arrow"
           >Хочу еще одну</a
         >
       </div>

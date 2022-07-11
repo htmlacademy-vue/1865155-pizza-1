@@ -1,7 +1,7 @@
 <template>
   <main class="layout">
     <div class="layout__sidebar sidebar">
-      <a href="index.html" class="logo layout__logo">
+      <a href="/" class="logo layout__logo">
         <img
           src="@/assets/img/logo.svg"
           alt="V!U!E! Pizza logo"
@@ -10,8 +10,10 @@
         />
       </a>
 
-      <a class="layout__link layout__link--active" href="#">История заказов</a>
-      <a class="layout__link" href="#">Мои данные</a>
+      <a class="layout__link layout__link--active" href="/Orders"
+        >История заказов</a
+      >
+      <a class="layout__link" href="/Profile/1">Мои данные</a>
     </div>
 
     <div class="layout__content">

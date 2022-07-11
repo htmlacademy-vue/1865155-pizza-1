@@ -79,13 +79,7 @@ export default {
 
   methods: {
     getCount(id) {
-      let index = this.myPizzaIngredients.findIndex((item) => item.id === id);
-      if (index === -1) {
-        return 0;
-      } else {
-        let value = this.myPizzaIngredients[index].count;
-        return value;
-      }
+      return this.myPizzaIngredients.find((item) => item.id === id)?.count || 0;
     },
     updateItemCount(count, id, price) {
       this.$emit("updateItemCount", count, id, price);

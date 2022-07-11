@@ -11,12 +11,12 @@ export default [
     component: Index,
   },
   {
-    path: "/login.html",
+    path: "/login",
     name: "Login",
     component: Login,
   },
   {
-    path: "/cart.html",
+    path: "/cart",
     name: "Cart",
     component: Cart,
     meta: {
