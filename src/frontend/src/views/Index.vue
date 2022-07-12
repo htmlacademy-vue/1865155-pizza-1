@@ -1,109 +1,56 @@
 <template>
-  <!DOCTYPE html>
-  <html lang="ru">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link
-        rel="preload"
-        href="fonts/roboto-bold.woff2"
-        as="font"
-        type="font/woff2"
-        crossorigin="anonymous"
-      />
-      <link
-        rel="preload"
-        href="fonts/roboto-regular.woff2"
-        as="font"
-        type="font/woff2"
-        crossorigin="anonymous"
-      />
-      <link
-        rel="preload"
-        href="fonts/roboto-light.woff2"
-        as="font"
-        type="font/woff2"
-        crossorigin="anonymous"
-      />
-      <link
-        rel="preload"
-        href="fonts/roboto-bold.woff"
-        as="font"
-        type="font/woff"
-        crossorigin="anonymous"
-      />
-      <link
-        rel="preload"
-        href="fonts/roboto-regular.woff"
-        as="font"
-        type="font/woff"
-        crossorigin="anonymous"
-      />
-      <link
-        rel="preload"
-        href="fonts/roboto-light.woff"
-        as="font"
-        type="font/woff"
-        crossorigin="anonymous"
-      />
-      <link rel="stylesheet" href="css/style.min.css" />
-      <title>V!U!E! Pizza - главная</title>
-    </head>
-    <body>
-      <AppLayout :cartPrice="cartPrice" />
+  <div>
+    <main class="content">
+      <form action="#" method="post">
+        <div class="content__wrapper">
+          <h1 class="title title--big">Конструктор пиццы</h1>
 
-      <main class="content">
-        <form action="#" method="post">
-          <div class="content__wrapper">
-            <h1 class="title title--big">Конструктор пиццы</h1>
+          <BuilderDoughSelector
+            :pizzas="pizzas"
+            :myPizzaDough="myPizza.dough"
+            @getValueFromBuilder="editValue"
+          />
+          <BuilderSizeSelector
+            :pizzas="pizzas"
+            :myPizzaSize="myPizza.size"
+            @getValueFromBuilder="editValue"
+          />
+          <BuilderIngredientsSelector
+            :pizzas="pizzas"
+            :myPizzaSauce="myPizza.sauce"
+            :myPizzaIngredients="myPizza.ingredients"
+            @getValueFromBuilder="editValue"
+            @updateItemCount="updateItemCount"
+          />
 
-            <BuilderDoughSelector
-              :pizzas="pizzas"
-              :myPizzaDough="myPizza.dough"
-              @getValueFromBuilder="getValue"
+          <div class="content__pizza">
+            <BuilderNameSelector
+              v-model="myPizza.name"
+              @getNameFromBuilder="editValue"
             />
-            <BuilderSizeSelector
+            <BuilderPizzaView
+              :pizzaFoundationClass="pizzaFoundationClass()"
               :pizzas="pizzas"
-              :myPizzaSize="myPizza.size"
-              @getValueFromBuilder="getValue"
-            />
-            <BuilderIngredientsSelector
-              :pizzas="pizzas"
-              :myPizzaSauce="myPizza.sauce"
               :myPizzaIngredients="myPizza.ingredients"
-              @getValueFromBuilder="getValue"
-              @updateItemCount="updateItemCount"
+              @getCountFromDrop="getCountDrop"
             />
-
-            <div class="content__pizza">
-              <BuilderNameSelector
-                v-model="myPizza.name"
-                @getNameFromBuilder="getValue"
-              />
-              <BuilderPizzaView
-                :pizzaFoundationClass="pizzaFoundationClass()"
-                :pizzas="pizzas"
-                :myPizzaIngredients="myPizza.ingredients"
-                @getCountFromDrop="getCountDrop"
-              />
-              <BuilderPriceCounter
-                :price="price"
-                :myPizza="myPizza"
-                @getBake="addToCart"
-              />
-            </div>
+            <BuilderPriceCounter
+              :price="price"
+              :pizzaName="myPizza.name"
+              :ingredientsCount="myPizza.ingredients.length"
+              @getBake="addToCart"
+            />
           </div>
-        </form>
-      </main>
-    </body>
-  </html>
+        </div>
+      </form>
+    </main>
+  </div>
 </template>
 
 <script>
 import miscs from "@/static/misc.json";
 import pizzas from "@/static/pizza.json";
 import users from "@/static/user.json";
-import AppLayout from "../layouts/AppLayout.vue";
 import BuilderDoughSelector from "../modules/builder/components/BuilderDoughSelector.vue";
 import BuilderSizeSelector from "../modules/builder/components/BuilderSizeSelector.vue";
 import BuilderIngredientsSelector from "../modules/builder/components/BuilderIngredientsSelector.vue";
@@ -114,7 +61,6 @@ import BuilderNameSelector from "../modules/builder/components/BuilderNameSelect
 export default {
   name: "Index",
   components: {
-    AppLayout,
     BuilderDoughSelector,
     BuilderSizeSelector,
     BuilderIngredientsSelector,
@@ -150,7 +96,7 @@ export default {
     };
   },
   methods: {
-    getValue(data, prop, id, price) {
+    editValue(data, prop, id, price) {
       switch (prop) {
         case "name":
           this.myPizza.name = data;
@@ -172,13 +118,13 @@ export default {
           break;
       }
     },
-    updateItemCount(newValue, id, newPrice) {
+    updateItemCount(newValue, id, price) {
       let index = this.myPizza.ingredients.findIndex((item) => item.id === id);
       if (index === -1) {
         this.myPizza.ingredients.push({
           id: id,
           count: newValue,
-          price: newPrice,
+          price: price,
         });
         this.myPizza.ingredients.sort((a, b) => (a.id > b.id ? 1 : -1));
       } else {
@@ -186,7 +132,7 @@ export default {
           this.myPizza.ingredients.splice(index, 1);
         } else {
           this.myPizza.ingredients[index].count = newValue;
-          this.myPizza.ingredients[index].price = newPrice;
+          this.myPizza.ingredients[index].price = price;
         }
       }
     },
@@ -225,10 +171,6 @@ export default {
       });
       this.myPizza.name = "";
       this.myPizza.dough.value = "light";
-      /* this.$set() и  Object.assign() не помогают вызвать перерендер
-      RadioButton в выборе по дефолту соуса, размера, теста
-      вызов this.$forceUpdate() в дочернем компоненте тоже не помог
-      биндинг checked у RadioButton через метод тоже не помог */
       this.myPizza.dough.id = 1;
       this.myPizza.dough.price = 300;
       this.myPizza.size.value = "normal";
@@ -259,7 +201,9 @@ export default {
     },
     cartPrice: function () {
       if (this.cart.lenght != 0) {
-        return this.cart.reduce((a, b) => a + b["price"], 0);
+        let price = this.cart.reduce((a, b) => a + b["price"], 0);
+        this.$emit("updateCartPrice", price);
+        return price;
       } else {
         return 0;
       }
