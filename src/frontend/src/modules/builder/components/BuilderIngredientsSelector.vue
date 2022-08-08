@@ -15,7 +15,7 @@
               :value="getSauceValue(sauce.id)"
               :id="sauce.id"
               :price="sauce.price"
-              :checked="sauce.id === myPizzaSauce.id"
+              :myPizzaItemId="myPizzaSauce.id"
               @getValueFromRadio="sendValue"
             />
             <span>{{ sauce.name }}</span>

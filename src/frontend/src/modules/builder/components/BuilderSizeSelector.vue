@@ -20,7 +20,7 @@
             :id="size.id"
             :price="size.multiplier"
             class="visually-hidden"
-            :checked="size.id === myPizzaSize.id"
+            :myPizzaItemId="myPizzaSize.id"
             @getValueFromRadio="sendValue"
           />
           <span>{{ size.name }}</span>

@@ -18,8 +18,8 @@
             :value="getDoughValue(dough.id)"
             :id="dough.id"
             :price="dough.price"
+            :myPizzaItemId="myPizzaDough.id"
             class="visually-hidden"
-            :checked="dough.id === myPizzaDough.id"
             @getValueFromRadio="sendValue"
           />
           <b>{{ dough.name }}</b>
