@@ -2,6 +2,7 @@
   <input
     type="radio"
     :value="value"
+    :checked="id === myPizzaItemId"
     @click="$emit('getValueFromRadio', value, id, price)"
   />
 </template>
@@ -21,6 +22,10 @@ export default {
     price: {
       type: Number,
       default: 0,
+    },
+    myPizzaItemId: {
+      type: Number,
+      required: true,
     },
   },
 };

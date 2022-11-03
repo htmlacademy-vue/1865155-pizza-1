@@ -52,20 +52,22 @@
     <body>
       <header class="header">
         <div class="header__logo">
-          <a href="/" class="logo">
+          <router-link to="/" class="logo">
             <img
               src="@/assets/img/logo.svg"
               alt="V!U!E! Pizza logo"
               width="90"
               height="40"
             />
-          </a>
+          </router-link>
         </div>
         <div class="header__cart">
-          <a href="/cart">{{ cartPrice }} ₽</a>
+          <router-link to="/cart">{{ cartPrice }} ₽</router-link>
         </div>
         <div class="header__user">
-          <a href="/login" class="header__login"><span>Войти</span></a>
+          <router-link to="/login" class="header__login">
+            <span>Войти</span>
+          </router-link>
         </div>
       </header>
       <slot />
@@ -76,10 +78,10 @@
 <script>
 export default {
   name: "AppLayoutDefault",
-  props: {
-    cartPrice: {
-      type: Number,
-      required: true,
+
+  computed: {
+    cartPrice() {
+      return this.$store.state.cartPrice;
     },
   },
 };

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <AppLayout :cartPrice="cartPrice">
-      <router-view @updateCartPrice="updateCartPrice" />
+    <AppLayout>
+      <router-view />
     </AppLayout>
   </div>
 </template>
@@ -13,16 +13,6 @@ export default {
   name: "App",
   components: {
     AppLayout,
-  },
-  data() {
-    return {
-      cartPrice: 0,
-    };
-  },
-  methods: {
-    updateCartPrice(price) {
-      this.cartPrice = price;
-    },
   },
 };
 </script>

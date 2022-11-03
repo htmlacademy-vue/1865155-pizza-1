@@ -3,7 +3,7 @@
     <div class="pizza" :class="pizzaFoundationClass">
       <div class="pizza__wrapper">
         <div
-          v-for="filling in myPizzaIngredients"
+          v-for="filling in myPizza.ingredients"
           :key="filling.id"
           :class="setClass(filling.count, filling.id)"
         ></div>
@@ -15,26 +15,17 @@
 <script>
 export default {
   name: "BuilderPizzaView",
-  props: {
-    pizzaFoundationClass: {
-      type: String,
-      required: true,
-    },
-    pizzas: {
-      type: Object,
-      required: true,
-    },
-    myPizzaIngredients: {
-      type: Array,
-      required: true,
-    },
-  },
+
   methods: {
     onDrop(e) {
-      const count = e.dataTransfer.getData("ingredientCount");
       const id = e.dataTransfer.getData("ingredientId");
+      const count = e.dataTransfer.getData("ingredientCount");
       const price = e.dataTransfer.getData("ingredientPrice");
-      this.$emit("getCountFromDrop", count, id, price);
+      this.$store.commit("Builder/addIngredient", {
+        id: Number(id),
+        count: Number(count),
+        price: Number(price),
+      });
     },
     getIngredientClassName(imgUrl) {
       return "filling--" + imgUrl.match(/.*\/(.*)(\..*)$/)[1];
@@ -61,6 +52,29 @@ export default {
             this.getIngredientClassName(imgUrl) +
             " pizza__filling--third"
           );
+      }
+    },
+  },
+  computed: {
+    myPizza() {
+      return this.$store.state.Builder.myPizza;
+    },
+    pizzas() {
+      return this.$store.state.Builder.pizzas;
+    },
+    pizzaFoundationClass() {
+      if (this.myPizza.dough.value === "light") {
+        if (this.myPizza.sauce.value === "tomato") {
+          return "pizza--foundation--small-tomato";
+        } else {
+          return "pizza--foundation--small-creamy";
+        }
+      } else {
+        if (this.myPizza.sauce.value === "tomato") {
+          return "pizza--foundation--big-tomato";
+        } else {
+          return "pizza--foundation--big-creamy";
+        }
       }
     },
   },

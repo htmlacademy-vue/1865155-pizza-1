@@ -15,7 +15,7 @@
               :value="getSauceValue(sauce.id)"
               :id="sauce.id"
               :price="sauce.price"
-              :checked="sauce.id === myPizzaSauce.id"
+              :myPizzaItemId="myPizzaSauceId"
               @getValueFromRadio="sendValue"
             />
             <span>{{ sauce.name }}</span>
@@ -62,27 +62,17 @@ export default {
     ItemCounter,
     SelectorItem,
   },
-  props: {
-    myPizzaSauce: {
-      type: Object,
-      required: true,
-    },
-    pizzas: {
-      type: Object,
-      required: true,
-    },
-    myPizzaIngredients: {
-      type: Array,
-      required: true,
-    },
-  },
 
   methods: {
     getCount(id) {
       return this.myPizzaIngredients.find((item) => item.id === id)?.count || 0;
     },
     updateItemCount(count, id, price) {
-      this.$emit("updateItemCount", count, id, price);
+      this.$store.commit("Builder/addIngredient", {
+        id: id,
+        count: count,
+        price: price,
+      });
     },
     getSauceValue(sauceId) {
       if (sauceId === 1) {
@@ -95,7 +85,11 @@ export default {
       return "filling--" + imgUrl.match(/.*\/(.*)(\..*)$/)[1];
     },
     sendValue(data, id, price) {
-      this.$emit("getValueFromBuilder", data, "sauce", id, price);
+      this.$store.commit("Builder/setSauce", {
+        value: data,
+        id: id,
+        price: price,
+      });
     },
     isDraggable(id) {
       let index = this.myPizzaIngredients.findIndex((item) => item.id === id);
@@ -128,6 +122,17 @@ export default {
       e.dataTransfer.setData("ingredientCount", count);
       e.dataTransfer.setData("ingredientId", ingredient.id);
       e.dataTransfer.setData("ingredientPrice", ingredient.price);
+    },
+  },
+  computed: {
+    myPizzaSauceId() {
+      return this.$store.state.Builder.myPizza.sauce.id;
+    },
+    myPizzaIngredients() {
+      return this.$store.state.Builder.myPizza.ingredients;
+    },
+    pizzas() {
+      return this.$store.state.Builder.pizzas;
     },
   },
 };

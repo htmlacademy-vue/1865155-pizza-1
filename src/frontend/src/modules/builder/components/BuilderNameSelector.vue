@@ -5,8 +5,7 @@
       type="text"
       name="pizza_name"
       placeholder="Введите название пиццы"
-      :value="value"
-      @input="$emit('getNameFromBuilder', $event.target.value, 'name')"
+      v-model="myPizzaName"
     />
   </label>
 </template>
@@ -14,10 +13,15 @@
 <script>
 export default {
   name: "BuilderNameSelector",
-  props: {
-    value: {
-      type: String,
-      required: true,
+
+  computed: {
+    myPizzaName: {
+      get() {
+        return this.$store.state.Builder.myPizza.name;
+      },
+      set(newName) {
+        this.$store.commit("Builder/updateName", newName);
+      },
     },
   },
 };

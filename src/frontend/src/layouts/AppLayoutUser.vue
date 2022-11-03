@@ -52,20 +52,20 @@
     <body>
       <header class="header">
         <div class="header__logo">
-          <a href="/" class="logo">
+          <router-link to="/" class="logo">
             <img
               src="@/assets/img/logo.svg"
               alt="V!U!E! Pizza logo"
               width="90"
               height="40"
             />
-          </a>
+          </router-link>
         </div>
         <div class="header__cart">
-          <a href="/cart">0 ₽</a>
+          <router-link to="/cart">{{ cartPrice }} ₽</router-link>
         </div>
         <div class="header__user">
-          <a href="/profile/1">
+          <router-link to="/profile/1">
             <picture>
               <source
                 type="image/webp"
@@ -83,8 +83,10 @@
               />
             </picture>
             <span>Василий Ложкин</span>
-          </a>
-          <a href="/" class="header__logout"><span>Выйти</span></a>
+          </router-link>
+          <router-link to="/" class="header__logout">
+            <span>Выйти</span>
+          </router-link>
         </div>
       </header>
       <slot />
@@ -95,5 +97,11 @@
 <script>
 export default {
   name: "AppLayoutUser",
+
+  computed: {
+    cartPrice() {
+      return this.$store.state.cartPrice;
+    },
+  },
 };
 </script>

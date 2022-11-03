@@ -1,19 +1,20 @@
 <template>
   <main class="layout">
     <div class="layout__sidebar sidebar">
-      <a href="/" class="logo layout__logo">
+      <router-link to="/" class="logo layout__logo">
         <img
           src="@/assets/img/logo.svg"
           alt="V!U!E! Pizza logo"
           width="90"
           height="40"
         />
-      </a>
-
-      <a class="layout__link layout__link--active" href="/Orders"
-        >История заказов</a
-      >
-      <a class="layout__link" href="/Profile/1">Мои данные</a>
+      </router-link>
+      <router-link to="/Orders" class="layout__link layout__link--active">
+        История заказов
+      </router-link>
+      <router-link to="/Profile/1" class="layout__link">
+        Мои данные
+      </router-link>
     </div>
 
     <div class="layout__content">
