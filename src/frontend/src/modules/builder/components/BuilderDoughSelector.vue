@@ -18,7 +18,7 @@
             :value="getDoughValue(dough.id)"
             :id="dough.id"
             :price="dough.price"
-            :myPizzaItemId="myPizzaDough.id"
+            :myPizzaItemId="myPizzaDoughId"
             class="visually-hidden"
             @getValueFromRadio="sendValue"
           />
@@ -38,16 +38,7 @@ export default {
   components: {
     RadioButton,
   },
-  props: {
-    myPizzaDough: {
-      type: Object,
-      required: true,
-    },
-    pizzas: {
-      type: Object,
-      required: true,
-    },
-  },
+
   methods: {
     getDoughValue(doughId) {
       if (doughId === 1) {
@@ -57,7 +48,19 @@ export default {
       }
     },
     sendValue(data, id, price) {
-      this.$emit("getValueFromBuilder", data, "dough", id, price);
+      this.$store.commit("Builder/setDough", {
+        value: data,
+        id: id,
+        price: price,
+      });
+    },
+  },
+  computed: {
+    myPizzaDoughId() {
+      return this.$store.state.Builder.myPizza.dough.id;
+    },
+    pizzas() {
+      return this.$store.state.Builder.pizzas;
     },
   },
 };

@@ -62,7 +62,7 @@
           </router-link>
         </div>
         <div class="header__cart">
-          <router-link to="/cart">0 ₽</router-link>
+          <router-link to="/cart">{{ cartPrice }} ₽</router-link>
         </div>
         <div class="header__user">
           <router-link to="/profile/1">
@@ -97,5 +97,11 @@
 <script>
 export default {
   name: "AppLayoutUser",
+
+  computed: {
+    cartPrice() {
+      return this.$store.state.cartPrice;
+    },
+  },
 };
 </script>

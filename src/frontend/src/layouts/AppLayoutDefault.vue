@@ -78,10 +78,10 @@
 <script>
 export default {
   name: "AppLayoutDefault",
-  props: {
-    cartPrice: {
-      type: Number,
-      required: true,
+
+  computed: {
+    cartPrice() {
+      return this.$store.state.cartPrice;
     },
   },
 };

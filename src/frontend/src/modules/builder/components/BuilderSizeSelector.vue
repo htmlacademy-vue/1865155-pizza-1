@@ -20,7 +20,7 @@
             :id="size.id"
             :price="size.multiplier"
             class="visually-hidden"
-            :myPizzaItemId="myPizzaSize.id"
+            :myPizzaItemId="myPizzaSizeId"
             @getValueFromRadio="sendValue"
           />
           <span>{{ size.name }}</span>
@@ -38,16 +38,6 @@ export default {
   components: {
     RadioButton,
   },
-  props: {
-    myPizzaSize: {
-      type: Object,
-      required: true,
-    },
-    pizzas: {
-      type: Object,
-      required: true,
-    },
-  },
 
   methods: {
     getSizeValue(sizeId) {
@@ -60,7 +50,19 @@ export default {
       }
     },
     sendValue(data, id, price) {
-      this.$emit("getValueFromBuilder", data, "size", id, price);
+      this.$store.commit("Builder/setSize", {
+        value: data,
+        id: id,
+        multiplier: price,
+      });
+    },
+  },
+  computed: {
+    myPizzaSizeId() {
+      return this.$store.state.Builder.myPizza.size.id;
+    },
+    pizzas() {
+      return this.$store.state.Builder.pizzas;
     },
   },
 };
