@@ -1,33 +1,13 @@
 <template>
   <ul class="cart-list sheet">
-    <li
-      class="cart-list__item"
-      v-for="(product, index) in cartMain"
-      :key="index"
-    >
-      <div class="product cart-list__product">
-        <img
-          src="@/assets/img/product.svg"
-          class="product__img"
-          width="56"
-          height="56"
-          :alt="product.name"
-        />
-        <div class="product__text">
-          <h2>{{ product.name }}</h2>
-          <ul>
-            <li>{{ sizeDescriber(product) }}</li>
-            <li>{{ sauceDescriber(product) }}</li>
-            <li>{{ ingredientsDescriber(product) }}</li>
-          </ul>
-        </div>
-      </div>
+    <li class="cart-list__item" v-for="(product, index) in pizzas" :key="index">
+      <Product additionalClass="cart-list__product" :product="product" />
 
       <div class="counter cart-list__counter">
         <button
           type="button"
           class="counter__button counter__button--minus"
-          @click="changeCount(product.count - 1, index)"
+          @click="changeCount(product.quantity - 1, index)"
         >
           <span class="visually-hidden">Меньше</span>
         </button>
@@ -35,19 +15,19 @@
           type="text"
           name="counter"
           class="counter__input"
-          :value="product.count"
+          :value="product.quantity"
         />
         <button
           type="button"
           class="counter__button counter__button--plus counter__button--orange"
-          @click="changeCount(product.count + 1, index)"
+          @click="changeCount(product.quantity + 1, index)"
         >
           <span class="visually-hidden">Больше</span>
         </button>
       </div>
 
       <div class="cart-list__price">
-        <b>{{ product.price * product.count }} ₽</b>
+        <b>{{ price(product) * product.quantity }} ₽</b>
       </div>
 
       <div class="cart-list__button">
@@ -64,36 +44,15 @@
 </template>
 
 <script>
+import Product from "/src/common/components/Product.vue";
+
 export default {
   name: "CartMainList",
+  components: {
+    Product,
+  },
 
   methods: {
-    sizeDescriber(product) {
-      let sizeName = this.$store.state.Builder.pizzas.sizes.find(
-        (item) => item.id === product.size.id
-      ).name;
-      let doughName = this.$store.state.Builder.pizzas.dough
-        .find((item) => item.id === product.dough.id)
-        .name.toLowerCase()
-        .slice(0, -1);
-      return sizeName + ", на " + doughName + "м тесте";
-    },
-    sauceDescriber(product) {
-      let sauceName = this.$store.state.Builder.pizzas.sauces
-        .find((item) => item.id === product.sauce.id)
-        .name.toLowerCase();
-      return "Соус: " + sauceName;
-    },
-    ingredientsDescriber(product) {
-      let ingredientsName = "";
-      product.ingredients.forEach((element) => {
-        ingredientsName +=
-          this.$store.state.Builder.pizzas.ingredients
-            .find((item) => item.id === element.id)
-            .name.toLowerCase() + ", ";
-      });
-      return "Начинка: " + ingredientsName.slice(0, -2);
-    },
     edit(product, index) {
       this.$store.commit("Builder/restorePizza", {
         product: product,
@@ -104,10 +63,30 @@ export default {
     changeCount(newCount, index) {
       this.$store.commit("changeCount", { newCount: newCount, index: index });
     },
+    price(product) {
+      let multiplier = this.$store.state.Builder.pizzas.sizes.find(
+        (item) => item.id === product.sizeId
+      ).multiplier;
+      let doughPrice = this.$store.state.Builder.pizzas.dough.find(
+        (item) => item.id === product.doughId
+      ).price;
+      let saucePrice = this.$store.state.Builder.pizzas.sauces.find(
+        (item) => item.id === product.sauceId
+      ).price;
+      let ingredientsPrice = 0;
+      product.ingredients.forEach(
+        (element) =>
+          (ingredientsPrice +=
+            this.$store.state.Builder.pizzas.ingredients.find(
+              (item) => item.id === element.ingredientId
+            ).price * element.quantity)
+      );
+      return multiplier * (doughPrice + saucePrice + ingredientsPrice);
+    },
   },
   computed: {
-    cartMain() {
-      return this.$store.state.cart.main;
+    pizzas() {
+      return this.$store.state.newOrder.pizzas;
     },
   },
 };

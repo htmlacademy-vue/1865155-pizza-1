@@ -1,96 +1,177 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import modules from "@/store/modules";
-import miscsSource from "@/static/misc.json";
+import vuexPlugins from "@/plugins/vuexPlugins";
 
 Vue.use(Vuex);
 
+const newOrderDefaultState = () => {
+  return {
+    phone: "",
+    address: null,
+    pizzas: [],
+    misc: [],
+  };
+};
+
 export default new Vuex.Store({
+  plugins: [vuexPlugins],
   state: {
-    miscsSource,
-    miscs: [],
-    cartPrice: 0,
-    cart: {
-      main: [],
-      delivery: 1,
-    },
-    user: {
-      id: null,
-      name: "",
-      email: "",
-      avatar: "",
+    miscsSource: [],
+    newOrder: {
       phone: "",
+      address: null,
+      pizzas: [],
+      misc: [],
     },
-    popupVisible: false,
+    deliveryType: 1,
   },
   getters: {
-    setCartPrice(state) {
-      if (state.cart.main.length != 0) {
+    getCartPrice(state) {
+      if (state.newOrder.pizzas.length != 0) {
         let price = 0;
-        state.cart.main.forEach(function (item) {
-          price += item.price * item.count;
+        state.newOrder.pizzas.forEach(function (pizza) {
+          let multiplier = state.Builder.pizzas.sizes.find(
+            (item) => item.id === pizza.sizeId
+          ).multiplier;
+          let doughPrice = state.Builder.pizzas.dough.find(
+            (item) => item.id === pizza.doughId
+          ).price;
+          let saucePrice = state.Builder.pizzas.sauces.find(
+            (item) => item.id === pizza.sauceId
+          ).price;
+          let ingredientsPrice = 0;
+          pizza.ingredients.forEach(
+            (element) =>
+              (ingredientsPrice +=
+                state.Builder.pizzas.ingredients.find(
+                  (item) => item.id === element.ingredientId
+                ).price * element.quantity)
+          );
+          let pizzaPrice =
+            multiplier * (doughPrice + saucePrice + ingredientsPrice);
+          let itemPrice = pizzaPrice * pizza.quantity;
+          price += itemPrice;
         });
-        if (state.miscs.length != 0) {
-          state.miscs.forEach(function (item) {
-            price += item.price * item.count;
+        if (state.newOrder.misc.length != 0) {
+          state.newOrder.misc.forEach(function (miscitem) {
+            price +=
+              state.miscsSource.find((item) => item.id === miscitem.miscId)
+                .price * miscitem.quantity;
           });
         }
-        state.cartPrice = price;
+        return price;
       } else {
-        state.cartPrice = 0;
+        if (state.Builder.myPizza.ingredients.length != 0) {
+          let pizzaPrice =
+            state.Builder.myPizza.size.multiplier *
+            (state.Builder.myPizza.dough.price +
+              state.Builder.myPizza.sauce.price +
+              state.Builder.myPizza.ingredients.reduce(
+                (a, b) => a + b["price"] * b["count"],
+                0
+              ));
+          return pizzaPrice;
+        } else {
+          return 0;
+        }
       }
     },
   },
   mutations: {
     addToCart(state, payload) {
-      if (state.cart.main.length === 0) {
-        state.miscs = [...miscsSource];
-        state.miscs.forEach((element) => {
-          Vue.set(element, "count", 1);
+      if (state.newOrder.pizzas.length === 0) {
+        state.miscsSource.forEach((element) => {
+          state.newOrder.misc.push({
+            miscId: element.id,
+            quantity: 1,
+          });
         });
       }
+      let myingredients = [];
+      payload.myPizza.ingredients.forEach((element) =>
+        myingredients.push({
+          ingredientId: element.id,
+          quantity: element.count,
+        })
+      );
       if (typeof payload.myPizza.id != "undefined") {
-        state.cart.main[payload.myPizza.id].name = payload.myPizza.name;
-        state.cart.main[payload.myPizza.id].dough = payload.myPizza.dough;
-        state.cart.main[payload.myPizza.id].size = payload.myPizza.size;
-        state.cart.main[payload.myPizza.id].sauce = payload.myPizza.sauce;
-        state.cart.main[payload.myPizza.id].ingredients = [
-          ...payload.myPizza.ingredients,
+        state.newOrder.pizzas[payload.myPizza.id].name = payload.myPizza.name;
+        state.newOrder.pizzas[payload.myPizza.id].sauceId =
+          payload.myPizza.sauce.id;
+        state.newOrder.pizzas[payload.myPizza.id].doughId =
+          payload.myPizza.dough.id;
+        state.newOrder.pizzas[payload.myPizza.id].sizeId =
+          payload.myPizza.size.id;
+        state.newOrder.pizzas[payload.myPizza.id].ingredients = [
+          ...myingredients,
         ];
-        state.cart.main[payload.myPizza.id].price = payload.price;
       } else {
-        state.cart.main.push({
+        state.newOrder.pizzas.push({
           name: payload.myPizza.name,
-          dough: payload.myPizza.dough,
-          size: payload.myPizza.size,
-          sauce: payload.myPizza.sauce,
-          ingredients: [...payload.myPizza.ingredients],
-          count: 1,
-          price: payload.price,
+          sauceId: payload.myPizza.sauce.id,
+          doughId: payload.myPizza.dough.id,
+          sizeId: payload.myPizza.size.id,
+          ingredients: [...myingredients],
+          quantity: 1,
         });
       }
     },
     changeCount(state, payload) {
       if (payload.newCount <= 0) {
-        state.cart.main.splice(payload.index, 1);
+        state.newOrder.pizzas.splice(payload.index, 1);
       } else {
-        state.cart.main[payload.index].count = payload.newCount;
+        state.newOrder.pizzas[payload.index].quantity = payload.newCount;
       }
     },
     changeMiscCount(state, payload) {
       if (payload.newCount <= 0) {
-        state.miscs.splice(payload.index, 1);
+        state.newOrder.misc.splice(payload.index, 1);
       } else {
-        state.miscs[payload.index].count = payload.newCount;
+        state.newOrder.misc[payload.index].quantity = payload.newCount;
       }
     },
-    changeDeliveryType(state, payload) {
-      state.cart.delivery = Number(payload.value);
+    initMisc(state, payload) {
+      state.miscsSource = payload;
     },
-    popupVisible(state, payload) {
-      state.popupVisible = payload;
+    setNewOrderDefaultState(state) {
+      Object.assign(state.newOrder, newOrderDefaultState());
+    },
+    changeDeliveryType(state, payload) {
+      state.deliveryType = payload;
+    },
+    setOrderPhone(state, payload) {
+      state.newOrder.phone = payload;
+    },
+    setOrderAddress(state, payload) {
+      state.newOrder.address = payload;
+    },
+    setOrderAddressName(state, payload) {
+      console.log(payload);
+      state.newOrder.address.name = payload;
+    },
+    setOrderAddressStreet(state, payload) {
+      state.newOrder.address.street = payload;
+    },
+    setOrderAddressHouse(state, payload) {
+      state.newOrder.address.building = payload;
+    },
+    setOrderAddressApartment(state, payload) {
+      state.newOrder.address.flat = payload;
     },
   },
-  actions: {},
+  actions: {
+    async init({ dispatch }) {
+      dispatch("Builder/queryDough");
+      dispatch("Builder/queryIngredients");
+      dispatch("Builder/querySauces");
+      dispatch("Builder/querySizes");
+      dispatch("queryMisc");
+    },
+    async queryMisc({ commit }) {
+      const data = await this.$api.misc.query();
+      commit("initMisc", data);
+    },
+  },
   modules,
 });

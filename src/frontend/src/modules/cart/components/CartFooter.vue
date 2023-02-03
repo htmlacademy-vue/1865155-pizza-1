@@ -36,14 +36,26 @@
 <script>
 export default {
   name: "CartFooter",
+  data() {
+    return {
+      popupVisible: false,
+    };
+  },
 
   methods: {
     onClick() {
-      this.$store.commit("popupVisible", true);
+      let payload = { ...this.$store.state.newOrder };
+      if (this.user != null) {
+        payload.userId = this.user.id;
+      } else {
+        payload.userId = null;
+      }
+      this.$store.dispatch("Orders/postOrders", payload);
+      this.popupVisible = true;
     },
     onClickPopup() {
-      this.$store.commit("popupVisible", false);
-      if (this.userId) {
+      this.popupVisible = false;
+      if (this.user) {
         this.$router.push("/orders");
       } else {
         this.$router.push("/");
@@ -52,13 +64,13 @@ export default {
   },
   computed: {
     cartPrice() {
-      return this.$store.state.cartPrice;
+      return this.$store.getters.getCartPrice;
     },
-    popupVisible() {
-      return this.$store.state.popupVisible;
+    address() {
+      return this.$store.state.newOrder.address;
     },
-    userId() {
-      return this.$store.state.user.id;
+    user() {
+      return this.$store.state.Auth.user;
     },
   },
 };
