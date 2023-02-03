@@ -65,7 +65,7 @@
           <router-link to="/cart">{{ cartPrice }} ₽</router-link>
         </div>
         <div class="header__user">
-          <router-link to="/profile/1">
+          <router-link :to="`/profile/${user.id}`">
             <picture>
               <source
                 type="image/webp"
@@ -82,11 +82,11 @@
                 height="32"
               />
             </picture>
-            <span>Василий Ложкин</span>
+            <span>{{ user.name }}</span>
           </router-link>
-          <router-link to="/" class="header__logout">
+          <a href="#" class="header__logout" @click="logout">
             <span>Выйти</span>
-          </router-link>
+          </a>
         </div>
       </header>
       <slot />
@@ -98,9 +98,18 @@
 export default {
   name: "AppLayoutUser",
 
+  methods: {
+    async logout() {
+      await this.$store.dispatch("Auth/logout");
+      await this.$router.push("/login");
+    },
+  },
   computed: {
     cartPrice() {
-      return this.$store.state.cartPrice;
+      return this.$store.getters.getCartPrice;
+    },
+    user() {
+      return this.$store.state.Auth.user;
     },
   },
 };

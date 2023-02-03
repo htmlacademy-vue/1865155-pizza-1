@@ -64,10 +64,39 @@
         <div class="header__cart">
           <router-link to="/cart">{{ cartPrice }} ₽</router-link>
         </div>
-        <div class="header__user">
+        <div class="header__user" v-if="!isAuthenticated">
           <router-link to="/login" class="header__login">
             <span>Войти</span>
           </router-link>
+        </div>
+        <div class="header__user" v-if="isAuthenticated">
+          <router-link :to="`/profile/${user.id}`">
+            <picture>
+              <source
+                type="image/webp"
+                srcset="
+                  @/assets/img/users/user5.webp    1x,
+                  @/assets/img/users/user5@2x.webp 2x
+                "
+              />
+              <img
+                src="@/assets/img/users/user5.jpg"
+                srcset="@/assets/img/users/user5@2x.jpg"
+                alt="Василий Ложкин"
+                width="32"
+                height="32"
+              />
+            </picture>
+            <span>{{ user.name }}</span>
+          </router-link>
+          <a
+            href="#"
+            class="header__logout"
+            @click="logout"
+            v-if="isAuthenticated"
+          >
+            <span>Выйти</span>
+          </a>
         </div>
       </header>
       <slot />
@@ -79,9 +108,21 @@
 export default {
   name: "AppLayoutDefault",
 
+  methods: {
+    async logout() {
+      await this.$store.dispatch("Auth/logout");
+      await this.$router.push("/login");
+    },
+  },
   computed: {
     cartPrice() {
-      return this.$store.state.cartPrice;
+      return this.$store.getters.getCartPrice;
+    },
+    isAuthenticated() {
+      return this.$store.state.Auth.isAuthenticated;
+    },
+    user() {
+      return this.$store.state.Auth.user;
     },
   },
 };

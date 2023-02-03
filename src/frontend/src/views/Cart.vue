@@ -8,14 +8,16 @@
 
         <div
           class="sheet cart__empty"
-          v-if="this.$store.state.cart.main.length === 0"
+          v-if="this.$store.state.newOrder.pizzas.length === 0"
         >
           <p>В корзине нет ни одного товара</p>
         </div>
 
         <CartMainList />
-        <CartAdditionalList v-if="this.$store.state.cart.main.length != 0" />
-        <CartForm v-if="this.$store.state.cart.main.length != 0" />
+        <CartAdditionalList
+          v-if="this.$store.state.newOrder.pizzas.length != 0"
+        />
+        <CartForm v-if="this.$store.state.newOrder.pizzas.length != 0" />
       </div>
     </main>
     <CartFooter />

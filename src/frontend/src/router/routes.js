@@ -3,6 +3,7 @@ import Cart from "@/views/Cart.vue";
 import Orders from "@/views/Orders.vue";
 import Profile from "@/views/Profile.vue";
 import Login from "@/views/Login.vue";
+import { auth, isLoggedIn } from "@/middlewares";
 
 export default [
   {
@@ -14,21 +15,21 @@ export default [
     path: "/login",
     name: "Login",
     component: Login,
+    meta: {
+      middlewares: [isLoggedIn],
+    },
   },
   {
     path: "/cart",
     name: "Cart",
     component: Cart,
-    meta: {
-      layout: "AppLayoutUser",
-    },
   },
   {
     path: "/orders",
     name: "Orders",
     component: Orders,
     meta: {
-      layout: "AppLayoutUser",
+      middlewares: [auth],
     },
   },
   {
@@ -36,7 +37,7 @@ export default [
     name: "Profile",
     component: Profile,
     meta: {
-      layout: "AppLayoutUser",
+      middlewares: [auth],
     },
   },
 ];

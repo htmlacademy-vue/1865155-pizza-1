@@ -8,12 +8,12 @@
       >
         <p class="additional-list__description">
           <img
-            :src="changeUrl(misc.image)"
+            :src="changeUrl(misc.miscId)"
             width="39"
             height="60"
-            :alt="misc.name"
+            :alt="getName(misc.miscId)"
           />
-          <span>{{ misc.name }}</span>
+          <span>{{ getName(misc.miscId) }}</span>
         </p>
 
         <div class="additional-list__wrapper">
@@ -21,7 +21,7 @@
             <button
               type="button"
               class="counter__button counter__button--minus"
-              @click="changeMiscCount(misc.count - 1, index)"
+              @click="changeMiscCount(misc.quantity - 1, index)"
             >
               <span class="visually-hidden">Меньше</span>
             </button>
@@ -29,19 +29,19 @@
               type="text"
               name="counter"
               class="counter__input"
-              :value="misc.count"
+              :value="misc.quantity"
             />
             <button
               type="button"
               class="counter__button counter__button--plus counter__button--orange"
-              @click="changeMiscCount(misc.count + 1, index)"
+              @click="changeMiscCount(misc.quantity + 1, index)"
             >
               <span class="visually-hidden">Больше</span>
             </button>
           </div>
 
           <div class="additional-list__price">
-            <b>× {{ misc.price }} ₽</b>
+            <b>× {{ getPrice(misc.miscId) }} ₽</b>
           </div>
         </div>
       </li>
@@ -54,8 +54,15 @@ export default {
   name: "CartAdditionalList",
 
   methods: {
-    changeUrl(url) {
+    changeUrl(miscId) {
+      let url = this.$store.state.miscsSource.find(
+        (item) => item.id === miscId
+      ).image;
       return "/assets" + url.slice(7);
+    },
+    getName(miscId) {
+      return this.$store.state.miscsSource.find((item) => item.id === miscId)
+        .name;
     },
     changeMiscCount(newCount, index) {
       this.$store.commit("changeMiscCount", {
@@ -63,10 +70,14 @@ export default {
         index: index,
       });
     },
+    getPrice(miscId) {
+      return this.$store.state.miscsSource.find((item) => item.id === miscId)
+        .price;
+    },
   },
   computed: {
     miscs() {
-      return this.$store.state.miscs;
+      return this.$store.state.newOrder.misc;
     },
   },
 };

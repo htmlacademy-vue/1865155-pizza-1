@@ -8,9 +8,19 @@
 
 <script>
 import AppLayout from "@/layouts/AppLayout.vue";
+import { setAuth } from "@/common/helpers";
 
 export default {
   name: "App",
+  created() {
+    window.onerror = function (msg, url, line, col, error) {
+      console.error(error);
+    };
+    if (this.$jwt.getToken()) {
+      setAuth(this.$store);
+    }
+    this.$store.dispatch("init");
+  },
   components: {
     AppLayout,
   },

@@ -22,24 +22,7 @@ export default {
         myPizza: this.$store.state.Builder.myPizza,
         price: this.price,
       });
-      this.$store.commit("Builder/updateName", "");
-      this.$store.commit("Builder/setDough", {
-        value: "light",
-        id: 1,
-        price: 300,
-      });
-      this.$store.commit("Builder/setSize", {
-        value: "normal",
-        id: 2,
-        multiplier: 2,
-      });
-      this.$store.commit("Builder/setSauce", {
-        value: "creamy",
-        id: 2,
-        price: 50,
-      });
-      this.$store.commit("Builder/clearIngredients");
-      this.$store.commit("Builder/clearId");
+      this.$store.commit("Builder/setMyPizzaDefaultState");
       this.$router.push("/cart");
     },
   },
@@ -48,11 +31,7 @@ export default {
       return this.$store.state.Builder.myPizza;
     },
     isDisabled() {
-      if (this.myPizza.name != "" && this.myPizza.ingredients.length != 0) {
-        return false;
-      } else {
-        return true;
-      }
+      return this.myPizza.name === "" || this.myPizza.ingredients.length === 0;
     },
     price: function () {
       if (this.myPizza.ingredients.length != 0) {
