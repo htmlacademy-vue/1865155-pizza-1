@@ -16,7 +16,7 @@
         Оформить заказ
       </button>
     </div>
-    <transition v-if="popupVisible">
+    <transition name="fade" v-if="popupVisible">
       <div class="popup">
         <a href="#" class="close" @click="onClickPopup()">
           <span class="visually-hidden">Закрыть попап</span>
@@ -76,4 +76,17 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-to,
+.fade-leave {
+  opacity: 1;
+}
+</style>

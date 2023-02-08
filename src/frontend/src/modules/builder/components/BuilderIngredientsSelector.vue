@@ -35,6 +35,10 @@
               <SelectorItem
                 :ingredientName="ingredient.name"
                 :class="getIngredientClassName(ingredient.image)"
+                :ingredientId="ingredient.id"
+                :animateOnClickId="animateOnClickId"
+                :onDropCoordinates="onDropCoordinates"
+                :animateOnDropId="animateOnDropId"
               />
               <ItemCounter
                 :count="getCount(ingredient.id)"
@@ -62,6 +66,20 @@ export default {
     ItemCounter,
     SelectorItem,
   },
+  props: {
+    onDropCoordinates: {
+      type: Object,
+    },
+    animateOnDropId: {
+      type: Number,
+      default: 0,
+    },
+  },
+  data() {
+    return {
+      animateOnClickId: 0,
+    };
+  },
 
   methods: {
     getCount(id) {
@@ -73,6 +91,10 @@ export default {
         count: count,
         price: price,
       });
+      this.animateOnClickId = id;
+      setTimeout(() => {
+        this.animateOnClickId = 0;
+      }, 1000);
     },
     getSauceValue(sauceId) {
       if (sauceId === 1) {
@@ -133,6 +155,10 @@ export default {
     },
     pizzas() {
       return this.$store.state.Builder.pizzas;
+    },
+    animateCoordinates() {
+      console.log(this.coordinates);
+      return this.coordinates;
     },
   },
 };

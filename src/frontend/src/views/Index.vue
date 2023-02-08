@@ -7,11 +7,14 @@
 
           <BuilderDoughSelector />
           <BuilderSizeSelector />
-          <BuilderIngredientsSelector />
+          <BuilderIngredientsSelector
+            :onDropCoordinates="onDropCoordinates"
+            :animateOnDropId="animateOnDropId"
+          />
 
           <div class="content__pizza">
             <BuilderNameSelector />
-            <BuilderPizzaView />
+            <BuilderPizzaView @drop="setData" />
             <BuilderPriceCounter />
           </div>
         </div>
@@ -37,6 +40,21 @@ export default {
     BuilderPizzaView,
     BuilderPriceCounter,
     BuilderNameSelector,
+  },
+
+  data() {
+    return {
+      onDropCoordinates: { x: 0, y: 0 },
+      animateOnDropId: 0,
+    };
+  },
+
+  methods: {
+    setData(x, y, id) {
+      this.onDropCoordinates.x = x;
+      this.onDropCoordinates.y = y;
+      this.animateOnDropId = Number(id);
+    },
   },
 };
 </script>
