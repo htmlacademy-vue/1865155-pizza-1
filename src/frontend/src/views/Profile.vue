@@ -1,12 +1,17 @@
 <template>
   <main class="layout">
     <div class="layout__sidebar sidebar">
-      <router-link to="/" class="logo layout__logo">
+      <router-link
+        to="/"
+        class="logo layout__logo"
+        style="padding-bottom: 54px"
+      >
         <img
           src="@/assets/img/logo.svg"
           alt="V!U!E! Pizza logo"
           width="90"
           height="40"
+          style="margin-left: 29px"
         />
       </router-link>
       <router-link to="/Orders" class="layout__link">

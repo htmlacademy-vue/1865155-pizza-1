@@ -21,11 +21,15 @@ export default {
       const id = e.dataTransfer.getData("ingredientId");
       const count = e.dataTransfer.getData("ingredientCount");
       const price = e.dataTransfer.getData("ingredientPrice");
+      this.$emit("drop", e.clientX, e.clientY, id);
       this.$store.commit("Builder/addIngredient", {
         id: Number(id),
         count: Number(count),
         price: Number(price),
       });
+      setTimeout(() => {
+        this.$emit("drop", e.clientX, e.clientY, 0);
+      }, 1000);
     },
     getIngredientClassName(imgUrl) {
       return "filling--" + imgUrl.match(/.*\/(.*)(\..*)$/)[1];
