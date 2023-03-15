@@ -55,9 +55,9 @@
 </template>
 
 <script>
-import ItemCounter from "/src/common/components/ItemCounter.vue";
-import SelectorItem from "/src/common/components/SelectorItem.vue";
-import RadioButton from "/src/common/components/RadioButton.vue";
+import ItemCounter from "@/common/components/ItemCounter.vue";
+import SelectorItem from "@/common/components/SelectorItem.vue";
+import RadioButton from "@/common/components/RadioButton.vue";
 
 export default {
   name: "BuilderIngredientsSelector",
