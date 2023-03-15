@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import RadioButton from "/src/common/components/RadioButton.vue";
+import RadioButton from "@/common/components/RadioButton.vue";
 
 export default {
   name: "BuilderDoughSelector",

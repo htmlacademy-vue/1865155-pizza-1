@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import Product from "/src/common/components/Product.vue";
+import Product from "@/common/components/Product.vue";
 
 export default {
   name: "CartMainList",
